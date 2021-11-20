@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {SafeAreaView, View, StyleSheet} from 'react-native';
+import {SafeAreaView, View, StyleSheet, Text} from 'react-native';
 import Realm from 'realm';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -21,8 +21,10 @@ function App() {
   //set device status to waiting in order to initialize NFC
   const [deviceStatus, setDeviceStatus] = React.useState('waiting');
   //define where the scanned data will be put into
-  const [scannedData, setScannedData] = React.useState({});
+  const [permitted, setPermitted] = React.useState(null);
 
+  //defined where the scaanned user will be put into
+  const [scannedUser, setScannedUser] = React.useState([]);
   // The tasks will be set once the realm has opened and the collection has been queried.
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);
@@ -116,6 +118,7 @@ function App() {
         .then(() => console.log('NFC has been started.'))
         .then(() =>
           NFC.addListener('test', async data => {
+            handleCardController(data?.scanned);
             return handleAddLog({
               card_number: data?.scanned,
               datetime: new Date(),
@@ -124,7 +127,7 @@ function App() {
         )
         .catch(error => console.log(error));
     }
-  }, [deviceStatus, scannedData, handleAddLog]);
+  }, [deviceStatus, handleAddLog, handleCardController]);
 
   useEffect(() => {
     openRealm();
@@ -173,6 +176,38 @@ function App() {
     [realmRef],
   );
 
+  const handleCardController = useCallback(
+    card_number => {
+      if (!card_number) {
+        return;
+      }
+      const realm = realmRef.current;
+      // Everything in the function passed to "realm.write" is a transaction and will
+      // hence succeed or fail together. A transcation is the smallest unit of transfer
+      // in Realm so we want to be mindful of how much we put into one single transaction
+      // and split them up if appropriate (more commonly seen server side). Since clients
+      // may occasionally be online during short time spans we want to increase the probability
+      // of sync participants to successfully sync everything in the transaction, otherwise
+      // no changes propagate and the transaction needs to start over when connectivity allows.
+      console.log(card_number);
+      const user = realm
+        ?.objects('User')
+        ?.filtered(`card_number == '${card_number}'`);
+      console.log(user);
+      if (user?.length) {
+        setPermitted(true);
+        setScannedUser(JSON.parse(JSON.stringify(user)));
+      } else {
+        setPermitted(false);
+      }
+      setTimeout(() => {
+        setScannedUser([]);
+        setPermitted(null);
+      }, 3000);
+    },
+    [realmRef],
+  );
+
   // const handleToggleTaskStatus = useCallback(
   //   task => {
   //     const realm = realmRef.current;
@@ -211,7 +246,37 @@ function App() {
     [realmRef],
   );
 
-  return (
+  return permitted !== null ? (
+    <SafeAreaView
+      style={{
+        backgroundColor: permitted === true ? 'green' : 'red',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minWidth: '100%',
+        minHeight: '100%',
+      }}>
+      {permitted === true ? (
+        <View>
+          <Text
+            style={{...styles?.pressableText, fontWeight: '900', fontSize: 25}}>
+            HOŞ GELDİNİZ
+          </Text>
+          <Text
+            style={{...styles?.pressableText, fontWeight: '900', fontSize: 25}}>
+            {scannedUser[0]?.first_name?.toUpperCase() +
+              ' ' +
+              scannedUser[0]?.last_name?.toUpperCase()}
+          </Text>
+        </View>
+      ) : (
+        <Text
+          style={{...styles?.pressableText, fontWeight: '900', fontSize: 25}}>
+          GEÇİŞ İZNİ YOK!
+        </Text>
+      )}
+    </SafeAreaView>
+  ) : (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" options={{title: 'Anasayfa'}}>
