@@ -1,10 +1,21 @@
 import React from 'react';
-import {Pressable, Text, View, StyleSheet} from 'react-native';
+import {Pressable, Text, View, StyleSheet, Image} from 'react-native';
+import logo from '../../assets/logo.png';
 import colors from '../styles/colors';
 
 function HomeScreen({navigation}) {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Image source={logo} />
+      <Text
+        style={{
+          fontSize: 17,
+          fontWeight: '700',
+          color: '#ffff',
+          marginBottom: 10,
+        }}>
+        Sistemik PDKS
+      </Text>
       <Pressable
         onPress={() => navigation.push('AddUser')}
         style={styles.submit}>
