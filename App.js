@@ -14,23 +14,7 @@ import colors from './app/styles/colors';
 import User from './app/models/User';
 import AddUserForm from './app/components/AddUserForm';
 import UserList from './app/components/UserList';
-
-function HomeScreen({navigation}) {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Pressable
-        onPress={() => navigation.push('AddUser')}
-        style={styles.submit}>
-        <Text style={styles.pressableText}>KULLANICI EKLEME</Text>
-      </Pressable>
-      <Pressable
-        onPress={() => navigation.push('UserList')}
-        style={styles.submit}>
-        <Text style={styles.pressableText}>KULLANICI LİSTESİ</Text>
-      </Pressable>
-    </View>
-  );
-}
+import HomeScreen from './app/components/HomeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -169,11 +153,15 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{title: 'Anasayfa'}}
-        />
+        <Stack.Screen name="Home" options={{title: 'Anasayfa'}}>
+          {props => (
+            <SafeAreaView style={styles.screen}>
+              <View style={styles.content}>
+                <HomeScreen {...props} />
+              </View>
+            </SafeAreaView>
+          )}
+        </Stack.Screen>
         <Stack.Screen name="AddUser">
           {props => (
             <SafeAreaView style={styles.screen}>
@@ -225,7 +213,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: 10,
     borderRadius: 55,
-    backgroundColor: '#262626',
+    backgroundColor: '#40a9ff',
   },
   pressableText: {
     color: colors.white,

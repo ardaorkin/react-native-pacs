@@ -57,9 +57,6 @@ function AddUserForm({navigation, onSubmit}) {
       <Pressable onPress={handleSubmit} style={styles.submit}>
         <Text style={styles.icon}>KULLANICI EKLE</Text>
       </Pressable>
-      <Pressable onPress={() => navigation.push('Home')} style={styles.submit}>
-        <Text style={styles.icon}>ANASAYFAYA DÖN</Text>
-      </Pressable>
     </View>
   );
 }
@@ -100,17 +97,19 @@ const styles = StyleSheet.create({
   submit: {
     height: 50,
     width: '100%',
+    fontWeight: '900',
+    color: '#ffff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
-    borderRadius: 5,
-    backgroundColor: 'limegreen',
+    margin: 10,
+    borderRadius: 55,
+    backgroundColor: '#40a9ff',
   },
   icon: {
     color: colors.white,
     textAlign: 'center',
     fontSize: 17,
-    fontWeight: 'bold',
+    fontWeight: '400',
   },
 });
 
