@@ -1,11 +1,22 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {SafeAreaView, View, StyleSheet} from 'react-native';
+import {SafeAreaView, View, StyleSheet, Text} from 'react-native';
 import Realm from 'realm';
-
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import colors from './app/styles/colors';
 import User from './app/models/User';
 import AddUserForm from './app/components/AddUserForm';
 import UserList from './app/components/UserList';
+
+function HomeScreen() {
+  return (
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Home Screen</Text>
+    </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
 
 function App() {
   // The tasks will be set once the realm has opened and the collection has been queried.
@@ -140,12 +151,17 @@ function App() {
   );
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <View style={styles.content}>
-        <AddUserForm onSubmit={handleAddUser} />
-        <UserList users={users} onDeleteUser={handleDeleteUser} />
-      </View>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+      </Stack.Navigator>
+      {/* <SafeAreaView style={styles.screen}>
+        <View style={styles.content}>
+          <AddUserForm onSubmit={handleAddUser} />
+          <UserList users={users} onDeleteUser={handleDeleteUser} />
+        </View>
+      </SafeAreaView> */}
+    </NavigationContainer>
   );
 }
 
