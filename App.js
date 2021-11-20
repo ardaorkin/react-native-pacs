@@ -1,12 +1,5 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {
-  SafeAreaView,
-  View,
-  StyleSheet,
-  Text,
-  Button,
-  Pressable,
-} from 'react-native';
+import {SafeAreaView, View, StyleSheet} from 'react-native';
 import Realm from 'realm';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -15,12 +8,24 @@ import User from './app/models/User';
 import AddUserForm from './app/components/AddUserForm';
 import UserList from './app/components/UserList';
 import HomeScreen from './app/components/HomeScreen';
+import NFC from 'react-native-rfid-nfc-scanner';
+import Log from './app/models/Log';
+import LogList from './app/components/LogList';
+
+//create scanner instance
+const initNFC = async () => NFC.initialize();
 
 const Stack = createNativeStackNavigator();
 
 function App() {
+  //set device status to waiting in order to initialize NFC
+  const [deviceStatus, setDeviceStatus] = React.useState('waiting');
+  //define where the scanned data will be put into
+  const [scannedData, setScannedData] = React.useState({});
+
   // The tasks will be set once the realm has opened and the collection has been queried.
   const [users, setUsers] = useState([]);
+  const [logs, setLogs] = useState([]);
   // We store a reference to our realm using useRef that allows us to access it via
   // realmRef.current for the component's lifetime without causing rerenders if updated.
   const realmRef = useRef(null);
@@ -28,12 +33,13 @@ function App() {
   // We store the listener in "subscriptionRef" to be able to remove it when the component unmounts.
 
   const usersRef = useRef(null);
+  const logsRef = useRef(null);
 
   const openRealm = useCallback(async () => {
     try {
       // Open a local realm file with the schema(s) that are a part of this realm.
       const config = {
-        schema: [User.schema],
+        schema: [User.schema, Log.schema],
         // Uncomment the line below to specify that this Realm should be deleted if a migration is needed.
         // (This option is not available on synced realms and is NOT suitable for production when set to true)
         // deleteRealmIfMigrationNeeded: true   // default is false
@@ -49,6 +55,11 @@ function App() {
       const usersResults = realm.objects('User');
       if (usersResults?.length) {
         setUsers(usersResults);
+      }
+
+      const logsResults = realm.objects('Log');
+      if (logsResults?.length) {
+        setLogs(logsResults);
       }
 
       // Live queries and objects emit notifications when something has changed that we can listen for.
@@ -67,6 +78,11 @@ function App() {
         // argument) will not trigger a rerender since it is the same reference
         setUsers(realm.objects('User'));
       });
+
+      logsRef.current = logsResults;
+      logsResults.addListener((/*collection, changes*/) => {
+        setLogs(realm.objects('Log'));
+      });
     } catch (err) {
       console.error('Error opening realm: ', err.message);
     }
@@ -77,13 +93,38 @@ function App() {
     usersSubscriptions?.removeAllListeners();
     usersSubscriptions.current = null;
 
+    const logsSubscriptions = logsRef.current;
+    logsSubscriptions?.removeAllListeners();
+    logsSubscriptions.current = null;
+
     const realm = realmRef.current;
     // If having listeners on the realm itself, also remove them using:
     // realm?.removeAllListeners();
     realm?.close();
     realmRef.current = null;
     setUsers([]);
+    setLogs([]);
   }, [realmRef]);
+
+  React.useEffect(() => {
+    if (deviceStatus === 'waiting') {
+      setInterval(() => {
+        setDeviceStatus(NFC.checkDeviceStatus());
+      }, 1000);
+    } else if (deviceStatus === 'ready') {
+      initNFC()
+        .then(() => console.log('NFC has been started.'))
+        .then(() =>
+          NFC.addListener('test', async data => {
+            return handleAddLog({
+              card_number: data?.scanned,
+              datetime: new Date(),
+            });
+          }),
+        )
+        .catch(error => console.log(error));
+    }
+  }, [deviceStatus, scannedData, handleAddLog]);
 
   useEffect(() => {
     openRealm();
@@ -107,6 +148,26 @@ function App() {
       // no changes propagate and the transaction needs to start over when connectivity allows.
       realm?.write(() => {
         realm?.create('User', new User(user));
+      });
+    },
+    [realmRef],
+  );
+
+  const handleAddLog = useCallback(
+    log => {
+      if (!log) {
+        return;
+      }
+      const realm = realmRef.current;
+      // Everything in the function passed to "realm.write" is a transaction and will
+      // hence succeed or fail together. A transcation is the smallest unit of transfer
+      // in Realm so we want to be mindful of how much we put into one single transaction
+      // and split them up if appropriate (more commonly seen server side). Since clients
+      // may occasionally be online during short time spans we want to increase the probability
+      // of sync participants to successfully sync everything in the transaction, otherwise
+      // no changes propagate and the transaction needs to start over when connectivity allows.
+      realm?.write(() => {
+        realm?.create('Log', new Log(log));
       });
     },
     [realmRef],
@@ -189,6 +250,19 @@ function App() {
             </SafeAreaView>
           )}
         </Stack.Screen>
+        <Stack.Screen name="Logs">
+          {props => (
+            <SafeAreaView style={styles.screen}>
+              <View style={styles.content}>
+                <LogList
+                  logs={logs}
+                  {...props}
+                  options={{title: 'HAREKETLER'}}
+                />
+              </View>
+            </SafeAreaView>
+          )}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -212,7 +286,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     margin: 10,
-    borderRadius: 55,
+    borderRadius: 5,
     backgroundColor: '#40a9ff',
   },
   pressableText: {
