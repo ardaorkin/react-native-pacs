@@ -15,6 +15,9 @@ function HomeScreen({navigation}) {
         style={styles.submit}>
         <Text style={styles.pressableText}>KULLANICI LİSTESİ</Text>
       </Pressable>
+      <Pressable onPress={() => navigation.push('Logs')} style={styles.submit}>
+        <Text style={styles.pressableText}>HAREKETLER</Text>
+      </Pressable>
     </View>
   );
 }
@@ -28,7 +31,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     margin: 10,
-    borderRadius: 55,
+    borderRadius: 5,
     backgroundColor: '#40a9ff',
   },
   pressableText: {
