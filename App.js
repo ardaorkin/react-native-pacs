@@ -1,5 +1,12 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {SafeAreaView, View, StyleSheet, Text} from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  StyleSheet,
+  Text,
+  Button,
+  Pressable,
+} from 'react-native';
 import Realm from 'realm';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -8,10 +15,19 @@ import User from './app/models/User';
 import AddUserForm from './app/components/AddUserForm';
 import UserList from './app/components/UserList';
 
-function HomeScreen() {
+function HomeScreen({navigation}) {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Home Screen</Text>
+      <Pressable
+        onPress={() => navigation.push('AddUser')}
+        style={styles.submit}>
+        <Text style={styles.pressableText}>KULLANICI EKLEME</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => navigation.push('UserList')}
+        style={styles.submit}>
+        <Text style={styles.pressableText}>KULLANICI LİSTESİ</Text>
+      </Pressable>
     </View>
   );
 }
@@ -152,30 +168,40 @@ function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Kullanıcı ekleme">
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-          name="Anasayfa"
+          name="Home"
           component={HomeScreen}
-          options={{title: 'Overview'}}
+          options={{title: 'Anasayfa'}}
         />
-        <Stack.Screen name="Kullanıcı ekleme">
+        <Stack.Screen name="AddUser">
           {props => (
             <SafeAreaView style={styles.screen}>
               <View style={styles.content}>
-                <AddUserForm onSubmit={handleAddUser} />
-                <UserList users={users} onDeleteUser={handleDeleteUser} />
+                <AddUserForm
+                  onSubmit={handleAddUser}
+                  {...props}
+                  options={{title: 'KULLANICI EKLEME'}}
+                />
+              </View>
+            </SafeAreaView>
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="UserList">
+          {props => (
+            <SafeAreaView style={styles.screen}>
+              <View style={styles.content}>
+                <UserList
+                  users={users}
+                  onDeleteUser={handleDeleteUser}
+                  {...props}
+                  options={{title: 'KULLANICI LİSTESİ'}}
+                />
               </View>
             </SafeAreaView>
           )}
         </Stack.Screen>
       </Stack.Navigator>
-      {/* <SafeAreaView style={styles.screen}>
-        <View style={styles.content}>
-          
-          <AddUserForm onSubmit={handleAddUser} />
-          <UserList users={users} onDeleteUser={handleDeleteUser} />
-        </View>
-      </SafeAreaView> */}
     </NavigationContainer>
   );
 }
@@ -189,6 +215,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 20,
     paddingHorizontal: 20,
+  },
+  submit: {
+    height: 50,
+    width: '70%',
+    fontWeight: '900',
+    color: '#ffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10,
+    borderRadius: 55,
+    backgroundColor: '#262626',
+  },
+  pressableText: {
+    color: colors.white,
+    textAlign: 'center',
+    fontSize: 17,
+    fontWeight: '400',
   },
 });
 

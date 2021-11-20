@@ -10,7 +10,7 @@ import {
 
 import colors from '../styles/colors';
 
-function AddUserForm({onSubmit}) {
+function AddUserForm({navigation, onSubmit}) {
   const [user, setUser] = useState({});
 
   const handleSubmit = () => {
@@ -56,6 +56,9 @@ function AddUserForm({onSubmit}) {
       />
       <Pressable onPress={handleSubmit} style={styles.submit}>
         <Text style={styles.icon}>KULLANICI EKLE</Text>
+      </Pressable>
+      <Pressable onPress={() => navigation.push('Home')} style={styles.submit}>
+        <Text style={styles.icon}>ANASAYFAYA DÖN</Text>
       </Pressable>
     </View>
   );
