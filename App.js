@@ -152,11 +152,26 @@ function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Navigator initialRouteName="Kullanıcı ekleme">
+        <Stack.Screen
+          name="Anasayfa"
+          component={HomeScreen}
+          options={{title: 'Overview'}}
+        />
+        <Stack.Screen name="Kullanıcı ekleme">
+          {props => (
+            <SafeAreaView style={styles.screen}>
+              <View style={styles.content}>
+                <AddUserForm onSubmit={handleAddUser} />
+                <UserList users={users} onDeleteUser={handleDeleteUser} />
+              </View>
+            </SafeAreaView>
+          )}
+        </Stack.Screen>
       </Stack.Navigator>
       {/* <SafeAreaView style={styles.screen}>
         <View style={styles.content}>
+          
           <AddUserForm onSubmit={handleAddUser} />
           <UserList users={users} onDeleteUser={handleDeleteUser} />
         </View>

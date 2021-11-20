@@ -26,7 +26,7 @@ function AddUserForm({onSubmit}) {
           placeholder="Ad"
           onChangeText={value => setUser({...user, first_name: value})}
           autoCorrect={false}
-          autoCapitalize="none"
+          autoCapitalize="sentences"
           style={{...styles.textInput, width: '47%'}}
         />
         <TextInput
@@ -34,7 +34,7 @@ function AddUserForm({onSubmit}) {
           placeholder="Soyad"
           onChangeText={value => setUser({...user, last_name: value})}
           autoCorrect={false}
-          autoCapitalize="none"
+          autoCapitalize="sentences"
           style={{...styles.textInput, width: '47%'}}
         />
       </View>
@@ -43,7 +43,7 @@ function AddUserForm({onSubmit}) {
         placeholder="Kart numarası"
         onChangeText={value => setUser({...user, card_number: value})}
         autoCorrect={false}
-        autoCapitalize="none"
+        autoCapitalize="sentences"
         style={styles.textInput}
       />
       <TextInput
@@ -51,7 +51,7 @@ function AddUserForm({onSubmit}) {
         placeholder="Sicil numarası"
         onChangeText={value => setUser({...user, employee_id: value})}
         autoCorrect={false}
-        autoCapitalize="none"
+        autoCapitalize="sentences"
         style={styles.textInput}
       />
       <Pressable onPress={handleSubmit} style={styles.submit}>
