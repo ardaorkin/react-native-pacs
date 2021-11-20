@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, FlatList, StyleSheet} from 'react-native';
 import Logtem from './Logtem';
-function LogList({logs, onDeleteUser}) {
+function LogList({logs, onDeleteLog}) {
   return (
     <View style={styles.listContainer}>
       <FlatList
@@ -11,7 +11,8 @@ function LogList({logs, onDeleteUser}) {
           <Logtem
             cardNumber={item?.card_number}
             date={item?.datetime}
-            onDelete={() => onDeleteUser(item)}
+            allowed={item?.allowed}
+            onDelete={() => onDeleteLog(item)}
             // Don't spread the Realm item as such: {...item}
           />
         )}

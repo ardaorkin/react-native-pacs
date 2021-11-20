@@ -3,7 +3,7 @@ import {View, Text, Pressable, Platform, StyleSheet} from 'react-native';
 
 import colors from '../styles/colors';
 
-function UserItem({fullName, onDelete}) {
+function UserItem({fullName, onDelete, card_number}) {
   return (
     <View style={styles.task}>
       <View style={styles.fullNameContainer}>
@@ -11,8 +11,13 @@ function UserItem({fullName, onDelete}) {
           {fullName}
         </Text>
       </View>
-      <Pressable onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteText}>Delete</Text>
+      <View style={styles.cardContainer}>
+        <Text numberOfLines={1} style={styles.fullName}>
+          {card_number}
+        </Text>
+      </View>
+      <Pressable onPress={onDelete} style={styles.status}>
+        <Text style={styles.icon}>X</Text>
       </Pressable>
     </View>
   );
@@ -24,7 +29,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     flexDirection: 'row',
     marginVertical: 8,
-    backgroundColor: colors.white,
+    backgroundColor: 'transparent',
     borderRadius: 5,
     ...Platform.select({
       ios: {
@@ -44,6 +49,16 @@ const styles = StyleSheet.create({
   fullNameContainer: {
     flex: 1,
     justifyContent: 'center',
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+  },
+  cardContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
   },
   fullName: {
     paddingHorizontal: 10,
@@ -54,9 +69,9 @@ const styles = StyleSheet.create({
     width: 50,
     height: '100%',
     justifyContent: 'center',
-    borderTopLeftRadius: 5,
-    borderBottomLeftRadius: 5,
-    backgroundColor: colors.gray,
+    borderRadius: 5,
+    marginLeft: 10,
+    backgroundColor: 'red',
   },
   completed: {
     backgroundColor: colors.purple,
