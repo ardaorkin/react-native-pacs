@@ -11,6 +11,7 @@ function UserList({users, onDeleteUser}) {
         renderItem={({item}) => (
           <UserItem
             fullName={item?.first_name + ' ' + item?.last_name}
+            card_number={item?.card_number}
             onDelete={() => onDeleteUser(item)}
             // Don't spread the Realm item as such: {...item}
           />

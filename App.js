@@ -118,16 +118,13 @@ function App() {
         .then(() => console.log('NFC has been started.'))
         .then(() =>
           NFC.addListener('test', async data => {
+            console.log(data);
             handleCardController(data?.scanned);
-            return handleAddLog({
-              card_number: data?.scanned,
-              datetime: new Date(),
-            });
           }),
         )
         .catch(error => console.log(error));
     }
-  }, [deviceStatus, handleAddLog, handleCardController]);
+  }, [deviceStatus, handleCardController, logs, openRealm, closeRealm, users]);
 
   useEffect(() => {
     openRealm();
@@ -197,15 +194,25 @@ function App() {
       if (user?.length) {
         setPermitted(true);
         setScannedUser(JSON.parse(JSON.stringify(user)));
+        handleAddLog({
+          card_number,
+          datetime: new Date(),
+          allowed: true,
+        });
       } else {
         setPermitted(false);
+        handleAddLog({
+          card_number,
+          datetime: new Date(),
+          allowed: false,
+        });
       }
       setTimeout(() => {
         setScannedUser([]);
         setPermitted(null);
       }, 3000);
     },
-    [realmRef],
+    [realmRef, handleAddLog],
   );
 
   // const handleToggleTaskStatus = useCallback(
@@ -238,6 +245,19 @@ function App() {
       const realm = realmRef.current;
       realm?.write(() => {
         realm?.delete(user);
+
+        // Alternatively if passing the ID as the argument to handleDeleteTask:
+        // realm?.delete(realm?.objectForPrimaryKey('Task', id));
+      });
+    },
+    [realmRef],
+  );
+
+  const handleDeleteLog = useCallback(
+    log => {
+      const realm = realmRef.current;
+      realm?.write(() => {
+        realm?.delete(log);
 
         // Alternatively if passing the ID as the argument to handleDeleteTask:
         // realm?.delete(realm?.objectForPrimaryKey('Task', id));
@@ -322,6 +342,7 @@ function App() {
                 <LogList
                   logs={logs}
                   {...props}
+                  onDeleteLog={handleDeleteLog}
                   options={{title: 'HAREKETLER'}}
                 />
               </View>
