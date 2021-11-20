@@ -1,11 +1,22 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {SafeAreaView, View, StyleSheet} from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  StyleSheet,
+  Text,
+  Button,
+  Pressable,
+} from 'react-native';
 import Realm from 'realm';
-
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import colors from './app/styles/colors';
 import User from './app/models/User';
 import AddUserForm from './app/components/AddUserForm';
 import UserList from './app/components/UserList';
+import HomeScreen from './app/components/HomeScreen';
+
+const Stack = createNativeStackNavigator();
 
 function App() {
   // The tasks will be set once the realm has opened and the collection has been queried.
@@ -140,12 +151,46 @@ function App() {
   );
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <View style={styles.content}>
-        <AddUserForm onSubmit={handleAddUser} />
-        <UserList users={users} onDeleteUser={handleDeleteUser} />
-      </View>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" options={{title: 'Anasayfa'}}>
+          {props => (
+            <SafeAreaView style={styles.screen}>
+              <View style={styles.content}>
+                <HomeScreen {...props} />
+              </View>
+            </SafeAreaView>
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="AddUser">
+          {props => (
+            <SafeAreaView style={styles.screen}>
+              <View style={styles.content}>
+                <AddUserForm
+                  onSubmit={handleAddUser}
+                  {...props}
+                  options={{title: 'KULLANICI EKLEME'}}
+                />
+              </View>
+            </SafeAreaView>
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="UserList">
+          {props => (
+            <SafeAreaView style={styles.screen}>
+              <View style={styles.content}>
+                <UserList
+                  users={users}
+                  onDeleteUser={handleDeleteUser}
+                  {...props}
+                  options={{title: 'KULLANICI LİSTESİ'}}
+                />
+              </View>
+            </SafeAreaView>
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -158,6 +203,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 20,
     paddingHorizontal: 20,
+  },
+  submit: {
+    height: 50,
+    width: '70%',
+    fontWeight: '900',
+    color: '#ffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10,
+    borderRadius: 55,
+    backgroundColor: '#40a9ff',
+  },
+  pressableText: {
+    color: colors.white,
+    textAlign: 'center',
+    fontSize: 17,
+    fontWeight: '400',
   },
 });
 
