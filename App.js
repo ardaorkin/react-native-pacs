@@ -11,7 +11,7 @@ import HomeScreen from './app/components/HomeScreen';
 import NFC from 'react-native-rfid-nfc-scanner';
 import Log from './app/models/Log';
 import LogList from './app/components/LogList';
-import convertUUID from './assets/scripts/splitUUID';
+import convertUUID from './assets/scripts/convertUUID';
 
 //create scanner instance
 const initNFC = async () => NFC.initialize();
