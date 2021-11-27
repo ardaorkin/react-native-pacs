@@ -11,6 +11,7 @@ import HomeScreen from './app/components/HomeScreen';
 import NFC from 'react-native-rfid-nfc-scanner';
 import Log from './app/models/Log';
 import LogList from './app/components/LogList';
+import convertUUID from './assets/scripts/splitUUID';
 
 //create scanner instance
 const initNFC = async () => NFC.initialize();
@@ -118,8 +119,8 @@ function App() {
         .then(() => console.log('NFC has been started.'))
         .then(() =>
           NFC.addListener('test', async data => {
-            console.log(data);
-            handleCardController(data?.scanned);
+            console.log(convertUUID(data?.scanned));
+            handleCardController(convertUUID(data?.scanned));
           }),
         )
         .catch(error => console.log(error));
